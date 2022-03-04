@@ -10,14 +10,40 @@ import (
 	"syscall"
 
 	"github.com/codegangsta/cli"
-
+	"github.com/joho/godotenv"
 	"github.com/yudai/gotty/backend/localcommand"
 	"github.com/yudai/gotty/pkg/homedir"
 	"github.com/yudai/gotty/server"
 	"github.com/yudai/gotty/utils"
 )
 
+var Version = "unknown_version"
+var CommitID = "unknown_commit"
+
+var helpTemplate = `NAME:
+   {{.Name}} - {{.Usage}}
+
+USAGE:
+   {{.Name}} [options] <command> [<arguments...>]
+
+VERSION:
+   {{.Version}}{{if or .Author .Email}}
+
+AUTHOR:{{if .Author}}
+  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
+  {{.Email}}{{end}}{{end}}
+
+OPTIONS:
+   {{range .Flags}}{{.}}
+   {{end}}
+`
+
+
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error getting env, not coming through %v", err)
+	}
 	app := cli.NewApp()
 	app.Name = "gotty"
 	app.Version = Version + "+" + CommitID
