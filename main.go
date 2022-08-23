@@ -10,7 +10,6 @@ import (
 	"syscall"
 
 	"github.com/codegangsta/cli"
-	"github.com/joho/godotenv"
 	"github.com/yudai/gotty/backend/localcommand"
 	"github.com/yudai/gotty/pkg/homedir"
 	"github.com/yudai/gotty/server"
@@ -38,12 +37,7 @@ OPTIONS:
    {{end}}
 `
 
-
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error getting env, not coming through %v", err)
-	}
 	app := cli.NewApp()
 	app.Name = "gotty"
 	app.Version = Version + "+" + CommitID
@@ -121,7 +115,7 @@ func main() {
 		ctx, cancel := context.WithCancel(context.Background())
 		gCtx, gCancel := context.WithCancel(context.Background())
 
-		log.Printf("GoTTY is starting with command: %s", strings.Join(args, " "))
+		log.Printf("Webshell is starting with command: %s", strings.Join(args, " "))
 
 		errs := make(chan error, 1)
 		go func() {

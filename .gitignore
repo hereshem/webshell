@@ -4,3 +4,4 @@ builds
 js/node_modules/*
 .idea
 .env
+.vscode

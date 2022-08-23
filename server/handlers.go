@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
@@ -118,12 +116,6 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	}
 	params := query.Query()
 	var slave Slave
-	if t, ok := params["token"]; ok {
-		params["arg"] = getCommand(t[0])
-	}
-	if len(params["arg"]) == 0 {
-		params["arg"] = getCommand("")
-	}
 	slave, err = server.factory.New(params)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create backend")
@@ -174,33 +166,6 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	err = tty.Run(ctx)
 
 	return err
-}
-
-func getCommand(s string) []string {
-	log.Println("token", s)
-	defaultCommand := strings.Split("config current-context --kubeconfig local", " ")
-	if s == "" {
-		return defaultCommand
-	}
-	values ,_ := json.Marshal(map[string]string{"token": s})
-	//response, err := http.PostForm(os.Getenv("MONITOR_URL"), url.Values{"token": {s}})
-	response, err := http.Post(os.Getenv("MONITOR_URL"), "application/json", bytes.NewBuffer(values))
-	if err != nil {
-		return defaultCommand
-	}
-	var res map[string]interface{}
-	err = json.NewDecoder(response.Body).Decode(&res)
-	if err != nil {
-		return defaultCommand
-	}
-	log.Println("response", res)
-	if command, ok := res["command"]; ok {
-		if command.(string) == "" {
-			return defaultCommand
-		}
-		return strings.Split(command.(string), " ")
-	}
-	return defaultCommand
 }
 
 func (server *Server) handleIndex(w http.ResponseWriter, r *http.Request) {

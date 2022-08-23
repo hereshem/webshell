@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/elazarl/go-bindata-assetfs"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 
@@ -126,13 +126,13 @@ func (server *Server) Run(ctx context.Context, options ...RunOption) error {
 	if server.options.EnableTLS {
 		scheme = "https"
 	}
-	host, port, _ := net.SplitHostPort(listener.Addr().String())
-	log.Printf("HTTP server is listening at: %s", scheme+"://"+host+":"+port+path)
-	if server.options.Address == "0.0.0.0" {
-		for _, address := range listAddresses() {
-			log.Printf("Alternative URL: %s", scheme+"://"+address+":"+port+path)
-		}
-	}
+	// host, port, _ := net.SplitHostPort(listener.Addr().String())
+	log.Printf("HTTP server is listening at: %s", scheme+"://"+server.options.Address+":"+server.options.Port+path)
+	// if server.options.Address == "0.0.0.0" {
+	// 	for _, address := range listAddresses() {
+	// 		log.Printf("Alternative URL: %s", scheme+"://"+address+":"+port+path)
+	// 	}
+	// }
 
 	srvErr := make(chan error, 1)
 	go func() {
