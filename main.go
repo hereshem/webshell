@@ -16,8 +16,7 @@ import (
 	"github.com/yudai/gotty/utils"
 )
 
-var Version = "unknown_version"
-var CommitID = "unknown_commit"
+var Version = "1.0.1"
 
 var helpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
@@ -39,10 +38,10 @@ OPTIONS:
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "gotty"
-	app.Version = Version + "+" + CommitID
+	app.Name = "webshell"
+	app.Version = Version
 	app.Usage = "Share your terminal as a web application"
-	app.HideHelp = true
+	// app.HideHelp = true
 	cli.AppHelpTemplate = helpTemplate
 
 	appOptions := &server.Options{}
@@ -70,11 +69,6 @@ func main() {
 	)
 
 	app.Action = func(c *cli.Context) {
-		if len(c.Args()) == 0 {
-			msg := "Error: No command given."
-			cli.ShowAppHelp(c)
-			exit(fmt.Errorf(msg), 1)
-		}
 
 		configFile := c.String("config")
 		_, err := os.Stat(homedir.Expand(configFile))
@@ -95,6 +89,13 @@ func main() {
 		}
 
 		args := c.Args()
+		if len(args) == 0 {
+			// msg := "Error: No command given."
+			// cli.ShowAppHelp(c)
+			// exit(fmt.Errorf(msg), 1)
+			args = []string{"bash"}
+			appOptions.PermitWrite = true
+		}
 		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
 			exit(err, 3)
